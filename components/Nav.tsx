@@ -12,7 +12,7 @@ const Nav = ()  => {
           <Link href='/insertExpense'>Insert</Link>
         </li>
         <li>
-          <Link href='/categoryPage'>Categories</Link>
+          <Link href='/testingPage'>testing</Link>
         </li>
       </ul>
     </nav>

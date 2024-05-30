@@ -1,8 +1,8 @@
 import Head from "next/head";
-import activityTypes from "../datas/activityTypes";
+import category from "../datas/category";
 
 export default function About() {
-  const activities: any = activityTypes();
+  const categories: any = category();
 
   return (
     <div>
@@ -10,7 +10,7 @@ export default function About() {
         <title>About Page</title>
       </Head>
       
-      {activities.map((activity: String) => <p>{activity}</p>)}
+      {categories.map((category: String) => <p>{category}</p>)}
     </div>
   );
 }

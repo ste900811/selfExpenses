@@ -20,23 +20,12 @@ async function init() {
 })();
 
 export async function getUsers() {
-  console.log("Testing1")
   try {
-    if(!users) await init();
+    if(!users) { await init(); }
     const result = await users.find({}).toArray();
-    console.log("Result:", result)
+    console.log(result)
     return { result };
   } catch (error) {
     return { error: 'Failed to fetch users' };
   }
 }
-
-// import { MongoClient } from 'mongodb';
-
-// export const getUsers = async () => {
-//   const uri: any = process.env.MONGODB_URI;
-//   const mongoClient = new MongoClient(uri);
-
-//   const data = await mongoClient.db('selfExpenses').collection('users').find().toArray();
-//   console.log("Data:", data)
-// }

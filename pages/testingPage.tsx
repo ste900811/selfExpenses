@@ -1,39 +1,39 @@
 import Head from "next/head";
 import category from "../datas/category";
-import { getUsers } from '../lib/mongo/getUsers';
+// import { getUsers } from '../lib/mongo/getUsers';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
-// This is for fetching data from MongoDB database
-async function fetchUsers() {
-  const { users }: any = await getUsers();
-  if (!users) throw new Error('Failed to fetch users')
-  return users;
-}
+export default function testingPage() {
 
-export default async function testingPage() {
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get('/api/mongoDB/users');
+
+        setUsers(response.data.users.result);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   // This is for fetching data from local file
   const categories: any = category();
 
-  // This is fetching data from function above
-  const users = await fetchUsers();
-
   return (
     <div>
       <Head>
-        <title>About Page</title>
+        <title>Testing Page</title>
       </Head>
       
-      {categories.map((category: String) => <p>{category}</p>)}
+      {categories.map((category: any) => <p key={category}>{category}</p>)}
 
-      <h1>Users</h1>
-      <ul>
-        {users.map((user: any) => (
-          <li key={user._id}>
-            <p>{user.name}</p>
-            <p>{user.email}</p>
-          </li>
-        ))}
-      </ul>
+      {users.map((user: any) => <p key={user._id}>{user.name}</p>)}
     </div>
   );
 }

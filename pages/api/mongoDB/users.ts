@@ -3,9 +3,7 @@ import { getUsers } from "@/lib/mongo/getUsers";
 const handler = async (req: any, res: any) => {
   if (req.method === "GET") {
     try {
-      const {users, error} : any = await getUsers();
-      if (error) throw new Error(error);
-
+      const users : any = await getUsers();
       return res.status(200).json({ users });
     } catch (error: any) {
       return res.status(500).json({ error: error.message });

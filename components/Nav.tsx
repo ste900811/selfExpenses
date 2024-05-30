@@ -9,6 +9,9 @@ const Nav = ()  => {
           <Link href='/'>Home</Link>
         </li>
         <li>
+          <Link href='/insertExpense'>Insert</Link>
+        </li>
+        <li>
           <Link href='/categoryPage'>Categories</Link>
         </li>
       </ul>

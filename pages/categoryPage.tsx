@@ -1,7 +1,7 @@
 import Head from "next/head";
 import category from "../datas/category";
 
-export default function About() {
+export default function categoryPage() {
   const categories: any = category();
 
   return (

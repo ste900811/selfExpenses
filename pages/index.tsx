@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import indexStyles from '../styles/index.module.css';
 import category from "../datas/category";
+import axios from 'axios';
 
 export default function Home() {
   
@@ -9,6 +10,21 @@ export default function Home() {
   const [month, setMonth] = useState(currentDate.getMonth() + 1);
   const [day, setDay] = useState(currentDate.getDate());
   const [categories, setCategories] = useState(category());
+  const [details, setDetails] = useState([]);
+
+  useEffect(() => {
+    const fetchInitialData = async () => {
+      try{
+        const details = await axios.get('/api/mongoDB/getDetails');
+        setDetails(details.data.details.result);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchInitialData();
+    console.log("Details:", details);
+}, []);
+
 
   const updateYearAndDate = () => {
     console.log("Update Year and Date");
@@ -37,6 +53,7 @@ export default function Home() {
                     {categories.map((category: any) => <option value={category}>{category}</option>)}
                   </select>
         Details: 
+        
       </div>
 
     </div>

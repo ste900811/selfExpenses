@@ -28,3 +28,13 @@ export async function getDetails() {
     return { error: 'Failed to fetch details' };
   }
 }
+
+export async function postDetail(data: any) {
+  try {
+    if(!details) { await init(); }
+    await details.insertOne(data);
+    return "Details posted successfully";
+  } catch (error) {
+    return { error: 'Failed to post details' };
+  }
+}

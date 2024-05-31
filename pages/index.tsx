@@ -18,7 +18,7 @@ export default function Home() {
       try{
         // fetch details and store it in the array
         let detailsArray: String[] = [];
-        const details = await axios.get('/api/mongoDB/getDetails');
+        const details = await axios.get('/api/mongoDB/details');
         details.data.details.result.forEach((detail: any) => detailsArray.push(detail.detail.toString()));
         setDetails(detailsArray);
       } catch (error) {
@@ -26,17 +26,58 @@ export default function Home() {
       }
     };
     fetchInitialData();
-}, []);
-
+  }, []);
 
   const updateYearAndDate = () => {
     console.log("Update Year and Date");
-    let year = Number((document.getElementById("year") as HTMLInputElement).value);
-    let month = Number((document.getElementById("month") as HTMLInputElement).value);
+    let year = Number((document.getElementById("yearID") as HTMLInputElement).value);
+    let month = Number((document.getElementById("monthID") as HTMLInputElement).value);
     if (month < 1 || month > 12) { alert("Please enter a valid month"); return; }
     setYear(year);
     setMonth(month);
   }
+
+  const insertExpense = () => {
+    console.log("Insert Expense");
+    let year = Number((document.getElementById("yearID") as HTMLInputElement).value);
+    let month = Number((document.getElementById("monthID") as HTMLInputElement).value);
+    let day = Number((document.getElementById("dayID") as HTMLInputElement).value);
+    let category = (document.getElementById("categoryID") as HTMLSelectElement).value;
+    let detail = (document.getElementById("detailID") as HTMLInputElement).value;
+    let amount = (document.getElementById("amountID") as HTMLInputElement).value;
+
+    if (category === "" || detail === "" || amount === "") {
+      alert("Please enter all the fields"); return;
+    }
+
+    // if the category is not in the list
+    if (!categories.includes(category)) { alert("Please enter a valid category"); return; }
+
+    // if the detail is new detail
+    if (!details.includes(detail)) {
+      // add the detail to the array
+      setDetails([...details, detail]);
+
+      // insert the new detail into the database
+      axios.post('/api/mongoDB/details', { detail: detail })
+      .then((response) => {
+        console.log(response.data);
+      }).catch((error) => {
+        console.log(error);
+      })
+    }
+
+  //   // insert the expense into the database
+  //   axios.post('/api/mongoDB/expenses', 
+  //             { year: year, month: month, day: day, category: category, detail: detail, amount: amount })
+  //   .then((response) => {
+  //     console.log(response.data);
+  //   }).catch((error) => {
+  //     console.log(error);
+  //   })
+
+  }
+
 
   return (
     <div className = {indexStyles.container}>
@@ -45,17 +86,17 @@ export default function Home() {
       <h1>This is {year}/{ month < 10 ? 0+month.toString() : month } page</h1>
 
       <div className = {indexStyles.input}>
-        Year:  <input type="number" id="year" defaultValue={year.toString()}></input>
-        Month: <input type="number" id="month" min="1" max="12" defaultValue={month.toString() }></input>
+        Year:  <input type="number" id="yearID" defaultValue={year.toString()}></input>
+        Month: <input type="number" id="monthID" min="1" max="12" defaultValue={month.toString() }></input>
         <input type="button" value="Update" onClick={updateYearAndDate}></input>
       </div><p></p>
 
       <div>
-        Day: <input type="number" id="day" defaultValue={day.toString()}></input>
-        Category: <select name="category" id="category">
-                    {categories.map((category: any) => <option value={category}>{category}</option>)}
+        Day: <input type="number" id="dayID" defaultValue={day.toString()}></input>
+        Category: <select name="category" id="categoryID">
+                    {categories.map((category: any) => <option key={category} value={category}>{category}</option>)}
                   </select>
-        Details: <input type="text" id="Details" value={value} onChange={(e)=>{setValue(e.target.value);}} />
+        Details: <input type="text" id="detailID" value={value} onChange={(e)=>{setValue(e.target.value);}} />
                  <div>
                   {details.filter(detail => {
                             const searchTerm = value.toLowerCase();
@@ -64,6 +105,8 @@ export default function Home() {
                           .map((item: any) => <div className="dropDown" onClick={()=>{setValue(item);}} key={item}>{item}</div>)
                   }
                 </div>
+        Amount: <input type="text" id="amountID" value="1.99"/>
+        <input type="button" value="Insert" onClick={() => {insertExpense();}}></input>
       </div>
 
     </div>

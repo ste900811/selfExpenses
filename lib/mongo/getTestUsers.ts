@@ -8,18 +8,18 @@ async function init() {
   if (db) return;
   try {
     client = await clientPromise;
-    db = await client.db('selfExpenses');
+    db = await client.db('sample_mflix');
     users = await db.collection('users');
   } catch (error) {
     throw new Error('Error connecting to database');
   }
 }
-
+ 
 ;(async () => {
   await init();
 })();
 
-export async function getUsers() {
+export async function getTestUsers() {
   try {
     if(!users) { await init(); }
     const result = await users.find({}).toArray();

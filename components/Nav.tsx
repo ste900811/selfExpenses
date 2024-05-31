@@ -4,12 +4,13 @@ import navStyles from '../styles/Nav.module.css';
 const Nav = ()  => {
   return (
     <nav className={navStyles.nav}>
+      <h1>selfExpense</h1>
       <ul>
         <li>
           <Link href='/'>Home</Link>
         </li>
         <li>
-          <Link href='/insertExpense'>Insert</Link>
+          <Link href='/insertDeleteExpense'>Insert</Link>
         </li>
         <li>
           <Link href='/testingPage'>testing</Link>

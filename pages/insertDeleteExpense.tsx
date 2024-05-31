@@ -1,4 +1,3 @@
-import Head from "next/head";
 import { useState } from "react";
 
 export default function insertExpense() {
@@ -11,9 +10,7 @@ export default function insertExpense() {
 
   return (
     <div>
-      <Head>
-        <title>Insert</title>
-      </Head>
+      <title>Insert Page</title>
       
       <h1>Insert Expense</h1>
 

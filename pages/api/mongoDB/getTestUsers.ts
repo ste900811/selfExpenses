@@ -1,9 +1,9 @@
-import { getUsers } from "@/lib/mongo/getUsers";
+import { getTestUsers } from "@/lib/mongo/getTestUsers";
 
 const handler = async (req: any, res: any) => {
   if (req.method === "GET") {
     try {
-      const users : any = await getUsers();
+      const users : any = await getTestUsers();
       return res.status(200).json({ users });
     } catch (error: any) {
       return res.status(500).json({ error: error.message });

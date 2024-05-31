@@ -1,11 +1,10 @@
-import Head from "next/head";
+import indexStyles from '../styles/index.module.css';
+
 
 export default function Home() {
   return (
-    <div>
-      <Head>
-        <title>Home Page</title>
-      </Head>
+    <div className = {indexStyles.container}>
+      <title>Home Page</title>
       
       <h1>Home Page</h1>
     </div>

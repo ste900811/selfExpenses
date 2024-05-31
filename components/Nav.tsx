@@ -4,10 +4,9 @@ import navStyles from '../styles/Nav.module.css';
 const Nav = ()  => {
   return (
     <nav className={navStyles.nav}>
-      <h1>selfExpense</h1>
       <ul>
         <li>
-          <Link href='/'>Home</Link>
+          <Link href='/' className={navStyles.title}>selfExpense</Link>
         </li>
         <li>
           <Link href='/insertDeleteExpense'>Insert</Link>

@@ -8,6 +8,11 @@
   justify-content: flex-start;
 }
 
+.title {
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
 .nav ul {
   display: flex;
   justify-content: center;

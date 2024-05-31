@@ -12,24 +12,46 @@ export default function Home() {
   const [categories, setCategories] = useState(category());
   const [details, setDetails] = useState<String []>([]) ;
   const [value, setValue] = useState<any>("");
+  const [dailyExpenses, setDailyExpenses] = useState<any>([]);
 
   useEffect(() => {
     const fetchInitialData = async () => {
       try{
         
         // fetch details and store it in the array
-        let detailsArray: String[] = [];
         const details = await axios.get('/api/mongoDB/details');
+        let detailsArray: String[] = [];
         details.data.details.result.forEach((detail: any) => detailsArray.push(detail.detail.toString()));
         setDetails(detailsArray);
 
-        
+        // fetch expenses basaed on year and month
+        const expenses = await axios.get('/api/mongoDB/expenses', {params: {year: year, month: month}});
+        const dailyExpenses = expenses.data.expenses.result[0].day;
+
+        let hashDay = new Map();
+        dailyExpenses.forEach((expense: any) => {
+          if (hashDay.has(expense.day)) {
+            hashDay.get(expense.day).push(expense);
+          } else {
+            hashDay.set(expense.day, [expense]);
+          }
+        });
+
+        let dailyExpensesArray = []
+        for (let i = 1; i <= 31; i++) {
+          if (hashDay.has(i)) {
+            for (let j = 0; j < hashDay.get(i).length; j++) {
+              dailyExpensesArray.push(hashDay.get(i)[j]);
+            }
+          }
+        }
+        setDailyExpenses(dailyExpensesArray);
       } catch (error) {
         console.log(error);
       }
     };
     fetchInitialData();
-  }, []);
+  }, [year, month]);
 
   const updateYearAndDate = () => {
     console.log("Update Year and Date");
@@ -111,7 +133,11 @@ export default function Home() {
         Amount: <input type="text" id="amountID" value="1.99"/>
         <input type="button" value="Insert" onClick={() => {insertExpense();}}></input>
       </div>
-
+      
+      <div>
+        {dailyExpenses.map((expense: any) => <p key={expense._id}>{expense.day} {expense.category} {expense.detail} {expense.amount}</p>)}
+      </div>
+      
     </div>
   );
 }

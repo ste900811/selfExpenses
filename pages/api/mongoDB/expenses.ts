@@ -1,15 +1,15 @@
-import { postExpenses } from "@/lib/mongo/expenses";
+import { getExpenses, postExpenses } from "@/lib/mongo/expenses";
 
 const handler = async (req: any, res: any) => {
   
-  // if (req.method === "GET") {
-  //   try {
-  //     const details : any = await getDetails();
-  //     return res.status(200).json({ details });
-  //   } catch (error: any) {
-  //     return res.status(500).json({ error: error.message });
-  //   }
-  // }
+  if (req.method === "GET") {
+    try {
+      const expenses : any = await getExpenses(Number(req.query.year), Number(req.query.month));
+      return res.status(200).json({ expenses });
+    } catch (error: any) {
+      return res.status(500).json({ error: error.message });
+    }
+  }
 
   if (req.method === "POST") {
     try {

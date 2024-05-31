@@ -23,8 +23,8 @@ export async function postExpenses(data: any) {
   try {
     if(!expenses) { await init(); }
     await expenses.insertOne(data);
-    return "Details posted successfully";
+    return "Expense posted successfully";
   } catch (error) {
-    return { error: 'Failed to post details' };
+    return { error: 'Failed to post expense' };
   }
 }

@@ -16,11 +16,14 @@ export default function Home() {
   useEffect(() => {
     const fetchInitialData = async () => {
       try{
+        
         // fetch details and store it in the array
         let detailsArray: String[] = [];
         const details = await axios.get('/api/mongoDB/details');
         details.data.details.result.forEach((detail: any) => detailsArray.push(detail.detail.toString()));
         setDetails(detailsArray);
+
+        
       } catch (error) {
         console.log(error);
       }
@@ -67,14 +70,14 @@ export default function Home() {
       })
     }
 
-  //   // insert the expense into the database
-  //   axios.post('/api/mongoDB/expenses', 
-  //             { year: year, month: month, day: day, category: category, detail: detail, amount: amount })
-  //   .then((response) => {
-  //     console.log(response.data);
-  //   }).catch((error) => {
-  //     console.log(error);
-  //   })
+    // insert the expense into the database
+    axios.post('/api/mongoDB/expenses', 
+              { year: year, month: month, day: day, category: category, detail: detail, amount: amount })
+    .then((response) => {
+      console.log(response.data);
+    }).catch((error) => {
+      console.log(error);
+    })
 
   }
 

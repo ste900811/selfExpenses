@@ -10,19 +10,22 @@ export default function Home() {
   const [month, setMonth] = useState(currentDate.getMonth() + 1);
   const [day, setDay] = useState(currentDate.getDate());
   const [categories, setCategories] = useState(category());
-  const [details, setDetails] = useState([]);
+  const [details, setDetails] = useState<String []>([]) ;
+  const [value, setValue] = useState<any>("");
 
   useEffect(() => {
     const fetchInitialData = async () => {
       try{
+        // fetch details and store it in the array
+        let detailsArray: String[] = [];
         const details = await axios.get('/api/mongoDB/getDetails');
-        setDetails(details.data.details.result);
+        details.data.details.result.forEach((detail: any) => detailsArray.push(detail.detail.toString()));
+        setDetails(detailsArray);
       } catch (error) {
         console.log(error);
       }
     };
     fetchInitialData();
-    console.log("Details:", details);
 }, []);
 
 
@@ -52,8 +55,15 @@ export default function Home() {
         Category: <select name="category" id="category">
                     {categories.map((category: any) => <option value={category}>{category}</option>)}
                   </select>
-        Details: 
-        
+        Details: <input type="text" id="Details" value={value} onChange={(e)=>{setValue(e.target.value);}} />
+                 <div>
+                  {details.filter(detail => {
+                            const searchTerm = value.toLowerCase();
+                            const name = detail.toLowerCase();
+                            return searchTerm && name.includes(searchTerm) && name !== searchTerm;})
+                          .map((item: any) => <div className="dropDown" onClick={()=>{setValue(item);}} key={item}>{item}</div>)
+                  }
+                </div>
       </div>
 
     </div>

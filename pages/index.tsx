@@ -9,48 +9,72 @@ export default function Home() {
   const [year, setYear] = useState(currentDate.getFullYear());
   const [month, setMonth] = useState(currentDate.getMonth() + 1);
   const [day, setDay] = useState(currentDate.getDate());
+  const [collectionID, setCollectionID] = useState<String>("");
   const [categories, setCategories] = useState(category());
   const [details, setDetails] = useState<String []>([]) ;
   const [value, setValue] = useState<any>("");
   const [dailyExpenses, setDailyExpenses] = useState<any>([]);
 
-  useEffect(() => {
-    const fetchInitialData = async () => {
-      try{
-        
-        // fetch details and store it in the array
-        const details = await axios.get('/api/mongoDB/details');
-        let detailsArray: String[] = [];
-        details.data.details.result.forEach((detail: any) => detailsArray.push(detail.detail.toString()));
-        setDetails(detailsArray);
+  // fetch the initial data function
+  const fetchInitialData = async (year: Number, month: Number) => {
+    try {
+      // fetch details and store it in the array, it helps when user enters detail will filtered by this array
+      const details = await axios.get('/api/mongoDB/details');
+      let detailsArray: String[] = [];
+      details.data.details.result.forEach((detail: any) => detailsArray.push(detail.detail.toString()));
+      setDetails(detailsArray);
 
-        // fetch expenses basaed on year and month
-        const expenses = await axios.get('/api/mongoDB/expenses', {params: {year: year, month: month}});
-        const dailyExpenses = expenses.data.expenses.result[0].day;
+      fetchingDailyExpenses(year, month);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
-        let hashDay = new Map();
-        dailyExpenses.forEach((expense: any) => {
-          if (hashDay.has(expense.day)) {
-            hashDay.get(expense.day).push(expense);
-          } else {
-            hashDay.set(expense.day, [expense]);
-          }
-        });
+  // fetch expenses basaed on year and month
+  const fetchingDailyExpenses = async (year: Number, month: Number) => {
+    // fetch expenses basaed on year and month
+    const expenses = await axios.get('/api/mongoDB/expenses', {params: {year: year, month: month}});
+    if (expenses.data.expenses.result.length === 0) {
+      setDailyExpenses([]);
+      alert("There is no expense for this month"); return;
+    }
 
-        let dailyExpensesArray = []
-        for (let i = 1; i <= 31; i++) {
-          if (hashDay.has(i)) {
-            for (let j = 0; j < hashDay.get(i).length; j++) {
-              dailyExpensesArray.push(hashDay.get(i)[j]);
-            }
-          }
-        }
-        setDailyExpenses(dailyExpensesArray);
-      } catch (error) {
-        console.log(error);
+    const dailyExpenses = expenses.data.expenses.result[0].day;
+    setCollectionID(expenses.data.expenses.result[0]._id);
+    
+    // hash the daily expenses based on day
+    let hashDay = new Map();
+    dailyExpenses.forEach((expense: any) => {
+      if (hashDay.has(expense.day)) {
+        hashDay.get(expense.day).push(expense);
+      } else {
+        hashDay.set(expense.day, [expense]);
       }
-    };
-    fetchInitialData();
+    });
+
+    // sorting the daily expenses based on the day, so when listed out will auto generate by date
+    // Also extract which day exists in the month, so when user enters the day, we will know need to add
+    //   the day to the database, or create the new day in the database
+    let dailyExpensesArray = []
+    let validDayArray = [];
+    for (let i = 1; i <= 31; i++) {
+      if (hashDay.has(i)) {
+        validDayArray.push(i);
+        for (let j = 0; j < hashDay.get(i).length; j++) {
+          dailyExpensesArray.push(hashDay.get(i)[j]);
+        }
+      }
+    }
+    setDailyExpenses(dailyExpensesArray);
+  }
+
+  // This is fetching the initial data
+  useEffect(() => {
+    fetchInitialData(year, month);
+  }, []);
+
+  useEffect(() => {
+    fetchingDailyExpenses(year, month);
   }, [year, month]);
 
   const updateYearAndDate = () => {
@@ -62,7 +86,7 @@ export default function Home() {
     setMonth(month);
   }
 
-  const insertExpense = () => {
+  const insertExpense = async () => {
     console.log("Insert Expense");
     let year = Number((document.getElementById("yearID") as HTMLInputElement).value);
     let month = Number((document.getElementById("monthID") as HTMLInputElement).value);
@@ -75,15 +99,15 @@ export default function Home() {
       alert("Please enter all the fields"); return;
     }
 
-    // if the category is not in the list
+    // if the category is not in the list, we will send an alert to user to enter a valid category
     if (!categories.includes(category)) { alert("Please enter a valid category"); return; }
 
-    // if the detail is new detail
+    // if the detail is new detail, we will add the detail to the array and insert the detail into the database
     if (!details.includes(detail)) {
       // add the detail to the array
       setDetails([...details, detail]);
 
-      // insert the new detail into the database
+      // insert the new detail into the database with API call
       axios.post('/api/mongoDB/details', { detail: detail })
       .then((response) => {
         console.log(response.data);
@@ -91,16 +115,24 @@ export default function Home() {
         console.log(error);
       })
     }
+    
+    // if      : dailyExpenses is empty, we will create first data(collection)
+    // else if : dailyExpenses is not empty, which mean we need to insert new data into the existing collection
+    if (dailyExpenses.length === 0) {
+      // insert the expense into the database
+      await axios.post('/api/mongoDB/expenses', 
+        { year: year, month: month, day: day, category: category, detail: detail, amount: amount })
+      .then((response) => { console.log(response.data); })
+      .catch((error) => { console.log(error); })
+    } else if (dailyExpenses.length !== 0) {
+      await axios.put('/api/mongoDB/expenses',
+        { collectionID: collectionID, day: day, category: category, detail: detail, amount: amount})
+      .then((response) => { console.log(response.data); })
+      .catch((error) => { console.log(error); })
+    }
 
-    // insert the expense into the database
-    axios.post('/api/mongoDB/expenses', 
-              { year: year, month: month, day: day, category: category, detail: detail, amount: amount })
-    .then((response) => {
-      console.log(response.data);
-    }).catch((error) => {
-      console.log(error);
-    })
-
+    // after insert the expense, we will update the daily expenses
+    fetchingDailyExpenses(year, month);
   }
 
 

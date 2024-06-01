@@ -1,4 +1,4 @@
-import { getExpenses, postExpenses } from "@/lib/mongo/expenses";
+import { getExpenses, postExpenses, putExpenses } from "@/lib/mongo/expenses";
 
 const handler = async (req: any, res: any) => {
   
@@ -25,6 +25,15 @@ const handler = async (req: any, res: any) => {
         }]
       }
       const result = await postExpenses(document);
+      return res.status(200).json({ result });
+    } catch (error: any) {
+      return res.status(500).json({ error: error.message });
+    }
+  }
+
+  if (req.method === "PUT") {
+    try {
+      const result = await putExpenses(req.body);
       return res.status(200).json({ result });
     } catch (error: any) {
       return res.status(500).json({ error: error.message });

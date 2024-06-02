@@ -137,8 +137,7 @@ export default function Home() {
   }
 
   const removeExpense = async (e: any) => {
-    console.log("Remove Expense")
-    let [day, category, detail, amount] = e.target.id.split("-");
+    let [day, category, detail, amount] = e.target.key.split("^^");
     await axios.put('/api/mongoDB/expenses',
       { collectionID: collectionID, day: day, category: category, detail: detail, amount: amount, action: "removeDay"})
     .then((response) => { console.log(response.data); })
@@ -175,15 +174,15 @@ export default function Home() {
                           .map((item: any) => <div className="dropDown" onClick={()=>{setValue(item);}} key={item}>{item}</div>)
                   }
                 </div>
-        Amount: <input type="text" id="amountID" value="1.99"/>
+        Amount: <input type="text" id="amountID"/>
         <input type="button" value="Insert" onClick={() => {insertExpense();}}></input>
       </div>
       
       <div>
         {dailyExpenses.map((expense: any) => 
-        <div>
+        <div className = {indexStyles.expensesContainer} key={"container"+expense.day+expense.category+expense.detail+expense.amount}>
           <span key={expense.day+expense.category+expense.detail+expense.amount}> {expense.day} {expense.category} {expense.detail} {expense.amount}</span>
-          <input type="button" value="Remove" id={expense.day+"-"+expense.category+"-"+expense.detail+"-"+expense.amount} onClick={(e) => {removeExpense(e);}}></input>
+          <input type="button" value="Remove" key={expense.day+"^^"+expense.category+"^^"+expense.detail+"^^"+expense.amount} onClick={(e) => {removeExpense(e);}}></input>
         </div>
         )}
       </div>

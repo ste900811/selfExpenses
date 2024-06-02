@@ -52,6 +52,7 @@ export async function putExpenses(data: any) {
     // if      : action is insertDay, we will insert the new expense into the dailyExpenses array
     // else if : action is removeDay, we will remove the expense from the dailyExpenses array
     if (data.action === "insertDay") {
+      
       // add the new expense to the dailyExpenses array
       dailyExpenses.push({
         "day" : data.day,
@@ -68,15 +69,12 @@ export async function putExpenses(data: any) {
 
       return "Expense added successfully";
     } else if (data.action === "removeDay") {
+
       // remove the expense from the dailyExpenses array
-
-      console.log(dailyExpenses)
-
       const updatedDailyExpenses = dailyExpenses.filter((expense: any) => {
         return !(expense.day == data.day && expense.category == data.category && expense.detail == data.detail && expense.amount == data.amount);
       });
 
-      console.log(updatedDailyExpenses)
       // update the expense with the updated dailyExpenses array
       expenses.updateOne(
         { "_id": objectID },

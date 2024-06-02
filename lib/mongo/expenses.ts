@@ -49,21 +49,23 @@ export async function putExpenses(data: any) {
     const currentExpense = await expenses.find( {"_id": objectID}).toArray();
     const dailyExpenses = currentExpense[0].day;
 
-    // add the new expense to the dailyExpenses array
-    dailyExpenses.push({
-      "day" : data.day,
-      "category" : data.category, 
-      "detail": data.detail, 
-      "amount" : data.amount
-    })
+    if (data.action === "insertDay") {
+      // add the new expense to the dailyExpenses array
+      dailyExpenses.push({
+        "day" : data.day,
+        "category" : data.category, 
+        "detail": data.detail, 
+        "amount" : data.amount
+      })
 
-    // update the expense with the new dailyExpenses array
-    expenses.updateOne(
-      { "_id": objectID },
-      { $set: { "day": dailyExpenses } }
-    )
+      // update the expense with the new dailyExpenses array
+      expenses.updateOne(
+        { "_id": objectID },
+        { $set: { "day": dailyExpenses } }
+      )
 
-    return "Expense added successfully";
+      return "Expense added successfully";
+    }
   } catch (error) {
     return { error: 'Failed to fetch expenses' };
   }

@@ -108,7 +108,7 @@ export default function Home() {
       setDetails([...details, detail]);
 
       // insert the new detail into the database with API call
-      axios.post('/api/mongoDB/details', { detail: detail })
+      await axios.post('/api/mongoDB/details', { detail: detail })
       .then((response) => {
         console.log(response.data);
       }).catch((error) => {
@@ -126,7 +126,7 @@ export default function Home() {
       .catch((error) => { console.log(error); })
     } else if (dailyExpenses.length !== 0) {
       await axios.put('/api/mongoDB/expenses',
-        { collectionID: collectionID, day: day, category: category, detail: detail, amount: amount})
+        { collectionID: collectionID, day: day, category: category, detail: detail, amount: amount, action: "insertDay"})
       .then((response) => { console.log(response.data); })
       .catch((error) => { console.log(error); })
     }
@@ -139,8 +139,10 @@ export default function Home() {
   return (
     <div className = {indexStyles.container}>
       <title>Home Page</title>
-      
-      <h1>This is {year}/{ month < 10 ? 0+month.toString() : month } page</h1>
+
+      <div className= {indexStyles.title}>
+        <h1>This is {year}/{ month < 10 ? 0+month.toString() : month } page</h1>
+      </div>
 
       <div className = {indexStyles.input}>
         Year:  <input type="number" id="yearID" defaultValue={year.toString()}></input>
@@ -167,7 +169,8 @@ export default function Home() {
       </div>
       
       <div>
-        {dailyExpenses.map((expense: any) => <p key={expense._id}>{expense.day} {expense.category} {expense.detail} {expense.amount}</p>)}
+        {dailyExpenses.map((expense: any) => 
+        <p key={expense._id+expense.category+expense.detail+expense.amount}> {expense.day} {expense.category} {expense.detail} {expense.amount}</p>)}
       </div>
       
     </div>

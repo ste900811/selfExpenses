@@ -95,6 +95,7 @@ export default function Home() {
     let detail = (document.getElementById("detailID") as HTMLInputElement).value;
     let amount = (document.getElementById("amountID") as HTMLInputElement).value;
 
+    // Require all the fields to be entered
     if (category === "" || detail === "" || amount === "") {
       alert("Please enter all the fields"); return;
     }
@@ -118,13 +119,13 @@ export default function Home() {
     
     // if      : dailyExpenses is empty, we will create first data(collection)
     // else if : dailyExpenses is not empty, which mean we need to insert new data into the existing collection
-    if (dailyExpenses.length === 0) {
+    if (!collectionID) {
       // insert the expense into the database
       await axios.post('/api/mongoDB/expenses', 
         { year: year, month: month, day: day, category: category, detail: detail, amount: amount })
       .then((response) => { console.log(response.data); })
       .catch((error) => { console.log(error); })
-    } else if (dailyExpenses.length !== 0) {
+    } else if (collectionID) {
       await axios.put('/api/mongoDB/expenses',
         { collectionID: collectionID, day: day, category: category, detail: detail, amount: amount, action: "insertDay"})
       .then((response) => { console.log(response.data); })
@@ -135,6 +136,16 @@ export default function Home() {
     fetchingDailyExpenses(year, month);
   }
 
+  const removeExpense = async (e: any) => {
+    console.log("Remove Expense")
+    let [day, category, detail, amount] = e.target.id.split("-");
+    await axios.put('/api/mongoDB/expenses',
+      { collectionID: collectionID, day: day, category: category, detail: detail, amount: amount, action: "removeDay"})
+    .then((response) => { console.log(response.data); })
+    .catch((error) => { console.log(error); })
+
+    fetchingDailyExpenses(year, month);
+  }
 
   return (
     <div className = {indexStyles.container}>
@@ -170,7 +181,11 @@ export default function Home() {
       
       <div>
         {dailyExpenses.map((expense: any) => 
-        <p key={expense._id+expense.category+expense.detail+expense.amount}> {expense.day} {expense.category} {expense.detail} {expense.amount}</p>)}
+        <div>
+          <span key={expense.day+expense.category+expense.detail+expense.amount}> {expense.day} {expense.category} {expense.detail} {expense.amount}</span>
+          <input type="button" value="Remove" id={expense.day+"-"+expense.category+"-"+expense.detail+"-"+expense.amount} onClick={(e) => {removeExpense(e);}}></input>
+        </div>
+        )}
       </div>
       
     </div>

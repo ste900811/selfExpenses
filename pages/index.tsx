@@ -137,7 +137,7 @@ export default function Home() {
   }
 
   const removeExpense = async (e: any) => {
-    let [day, category, detail, amount] = e.target.key.split("^^");
+    let [day, category, detail, amount] = e.target.id.split("^^");
     await axios.put('/api/mongoDB/expenses',
       { collectionID: collectionID, day: day, category: category, detail: detail, amount: amount, action: "removeDay"})
     .then((response) => { console.log(response.data); })
@@ -182,7 +182,7 @@ export default function Home() {
         {dailyExpenses.map((expense: any) => 
         <div className = {indexStyles.expensesContainer} key={"container"+expense.day+expense.category+expense.detail+expense.amount}>
           <span key={expense.day+expense.category+expense.detail+expense.amount}> {expense.day} {expense.category} {expense.detail} {expense.amount}</span>
-          <input type="button" value="Remove" key={expense.day+"^^"+expense.category+"^^"+expense.detail+"^^"+expense.amount} onClick={(e) => {removeExpense(e);}}></input>
+          <input type="button" value="Remove" id={expense.day+"^^"+expense.category+"^^"+expense.detail+"^^"+expense.amount} onClick={(e) => {removeExpense(e);}}></input>
         </div>
         )}
       </div>
